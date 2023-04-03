@@ -1,0 +1,11 @@
+flow-funnel/node_modules
+flo-origin-story/node_modules
+flo-analytics/node_modules
+analytics-chat-bot/node_modules
+
+flow-funnel/git-backup
+flo-origin-story/git-backup
+flo-analytics/git-backup
+analytics-chat-bot/git-backup
+
+.DS_Store

@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "flo-pro-script-snippet",
+  "description": "",
+  "version": "0.0.1",
+  "icons": {
+    "16": "logo/logo-16.png",
+    "48": "logo/logo-48.png",
+    "128": "logo/logo-128.png"
+  },
+  "permissions": [],
+  "host_permissions": ["*://*/*"],
+  "content_scripts": [
+    {
+      "js": ["foreground.js"],
+      "run_at": "document_idle",
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "main.js",
+        "affLink.js",
+        "apiService.js",
+        "config.js",
+        "nbaUtils.js",
+        "ufcUtils.js",
+        "nflUtils.js",
+        "listener.js"
+      ],
+      "matches": ["<all_urls>"],
+      "use_dynamic_url": true
+    }
+  ]
+}

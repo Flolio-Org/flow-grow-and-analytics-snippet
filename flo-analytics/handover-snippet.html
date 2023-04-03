@@ -1,0 +1,350 @@
+<!-- analytics load -->
+<script>
+  !(function () {
+    "use strict";
+    var a = window.location,
+      o = window.document,
+      // r = o.currentScript || window.myAnalyticsScript;
+      s = "https://analytics.flolio.com/api/event";
+
+    // get utms from url and store in ls
+    const queryParams = new URLSearchParams(window.location.search);
+    const utmParams = {};
+    for (let [key, value] of queryParams) {
+      if (key.startsWith("utm_")) {
+        utmParams[key] = value;
+      }
+    }
+    if (Object.keys(utmParams).length) {
+      localStorage.setItem("flo_utms", JSON.stringify(utmParams));
+    }
+
+    // get referrer from page and store in ls for later events
+    const referrer = document.referrer;
+    // Check if the referrer is external
+    if (referrer && !referrer.startsWith(window.location.origin)) {
+      localStorage.setItem("flo_ref", referrer); // -> check for this value first, if not exists, then pass o.referrer || null
+    }
+
+    function l(t) {
+      console.warn("Ignoring Event: " + t);
+    }
+    function t(t, e) {
+      if (
+        /^localhost$|^127(\.[0-9]+){0,2}\.[0-9]+$|^\[::1?\]$/.test(
+          a.hostname
+        ) ||
+        "file:" === a.protocol
+      )
+        return l("localhost");
+      if (
+        !(
+          window._phantom ||
+          window.__nightmare ||
+          window.navigator.webdriver ||
+          window.Cypress
+        )
+      ) {
+        try {
+          if ("true" === window.localStorage.plausible_ignore)
+            return l("localStorage flag");
+        } catch (t) {}
+        // Get the utm parameters from local storage
+        const utmParams = JSON.parse(localStorage.getItem("flo_utms"));
+        const floRef = localStorage.getItem("flo_ref") || null;
+
+        // Create an array to hold the search query parameters
+        const queryParams = [];
+
+        // Loop through the utm parameters and add them to the query params array
+        for (const key in utmParams) {
+          if (utmParams.hasOwnProperty(key)) {
+            queryParams.push(
+              `${encodeURIComponent(key)}=${encodeURIComponent(utmParams[key])}`
+            );
+          }
+        }
+        // Create the search query string by joining the query params with "&"
+        const searchQuery =
+          queryParams.length > 0 ? `?${queryParams.join("&")}` : "";
+
+        // Attach the search query to the href
+        const hrefWithUtm =
+          a.href + (a.href.includes("utm") ? "" : searchQuery);
+        // console.log({ hrefWithUtm });
+        var i = {},
+          n =
+            ((i.n = t),
+            (i.u = hrefWithUtm),
+            (i.d = "exceed.story-demo.ogn-review.net-2"),
+            // (i.d = r.getAttribute("data-domain")),
+            (i.r = floRef || null),
+            e && e.meta && (i.m = JSON.stringify(e.meta)),
+            e && e.props && (i.p = e.props),
+            new XMLHttpRequest());
+        n.open("POST", s, !0),
+          n.setRequestHeader("Content-Type", "text/plain"),
+          n.send(JSON.stringify(i)),
+          (n.onreadystatechange = function () {
+            4 === n.readyState && e && e.callback && e.callback();
+          });
+      }
+    }
+    var e = (window.plausible && window.plausible.q) || [];
+    window.plausible = t;
+    for (var i, n = 0; n < e.length; n++) t.apply(this, e[n]);
+    function p() {
+      i !== a.pathname && ((i = a.pathname), t("pageview"));
+    }
+    var w,
+      c = window.history;
+    c.pushState &&
+      ((w = c.pushState),
+      (c.pushState = function () {
+        w.apply(this, arguments), p();
+      }),
+      window.addEventListener("popstate", p)),
+      "prerender" === o.visibilityState
+        ? o.addEventListener("visibilitychange", function () {
+            i || "visible" !== o.visibilityState || p();
+          })
+        : p();
+  })();
+</script>
+
+<!-- events -->
+<script>
+  (function () {
+    const n = document.createElement("link").relList;
+    if (n && n.supports && n.supports("modulepreload")) return;
+    for (const t of document.querySelectorAll('link[rel="modulepreload"]'))
+      u(t);
+    new MutationObserver((t) => {
+      for (const l of t)
+        if (l.type === "childList")
+          for (const a of l.addedNodes)
+            a.tagName === "LINK" && a.rel === "modulepreload" && u(a);
+    }).observe(document, { childList: !0, subtree: !0 });
+    function o(t) {
+      const l = {};
+      return (
+        t.integrity && (l.integrity = t.integrity),
+        t.referrerPolicy && (l.referrerPolicy = t.referrerPolicy),
+        t.crossOrigin === "use-credentials"
+          ? (l.credentials = "include")
+          : t.crossOrigin === "anonymous"
+          ? (l.credentials = "omit")
+          : (l.credentials = "same-origin"),
+        l
+      );
+    }
+    function u(t) {
+      if (t.ep) return;
+      t.ep = !0;
+      const l = o(t);
+      fetch(t.href, l);
+    }
+  })();
+  const T = {
+      CONNECT_WALLET: "Connect Wallet",
+      PURCHASED: "Purchased",
+      MINTED: "Minted",
+      BUY_NOW_CLICK: "Buy Now Click",
+      MINT_CLICK: "Mint Click",
+    },
+    r = {
+      API_URL: "",
+      EVENTS: T,
+      SELECTORS: {
+        MINT_BTN: {
+          event: T.MINT_CLICK,
+          element: function () {
+            return new Array(...document.querySelectorAll("button")).filter(
+              (e) => e.innerHTML === "Mint"
+            )[0];
+          },
+        },
+        MINT_WITH_CREDIT_BTN: {
+          event: T.MINT_CLICK,
+          element: function () {
+            return new Array(...document.querySelectorAll("button")).filter(
+              (e) => e.innerHTML === "Mint with Credit Card"
+            )[0];
+          },
+        },
+        BUY_BTN: {
+          event: T.BUY_NOW_CLICK,
+          element: function () {
+            return new Array(...document.querySelectorAll("button")).filter(
+              (e) => e.innerHTML === "Buy"
+            )[0];
+          },
+        },
+        BUY_WITH_CREDIT_BTN: {
+          event: T.BUY_NOW_CLICK,
+          element: function () {
+            return new Array(...document.querySelectorAll("button")).filter(
+              (e) => e.innerHTML === "Buy with Credit Card"
+            )[0];
+          },
+        },
+        SUCCESS_POPUP_MSG: {
+          element: function () {
+            return new Array(...document.querySelectorAll("div")).filter((e) =>
+              e.innerHTML.includes("You now own")
+            )[0];
+          },
+        },
+        VIEW_COLLECTION_BTN: {
+          element: function () {
+            return new Array(...document.querySelectorAll("button")).filter(
+              (e) => e.innerHTML.includes("View Collection")
+            )[0];
+          },
+        },
+        NFT_TOKEN_ID: {
+          element: function () {
+            var n;
+            const e = new Array(...document.querySelectorAll("div")).filter(
+              (o) => o.innerHTML === "Token ID"
+            )[0];
+            return (
+              ((n = e == null ? void 0 : e.nextSibling) == null
+                ? void 0
+                : n.innerHTML) || null
+            );
+          },
+        },
+        AMOUNT: {
+          element: function () {
+            var e;
+            return (e = document.querySelector(".text-4xl.font-bold")) == null
+              ? void 0
+              : e.innerHTML;
+          },
+        },
+      },
+    };
+  let I = null;
+  const c = r.SELECTORS.MINT_BTN,
+    s = r.SELECTORS.BUY_BTN,
+    i = r.SELECTORS.MINT_WITH_CREDIT_BTN,
+    d = r.SELECTORS.BUY_WITH_CREDIT_BTN;
+  function S() {
+    var e;
+    O((e = window.ethereum) == null ? void 0 : e.selectedAddress),
+      v(),
+      g(),
+      M();
+  }
+  (function (e) {
+    var n = e.pushState;
+    S(),
+      (e.pushState = function (o) {
+        return S(), n.apply(e, arguments);
+      });
+  })(window.history);
+  window.addEventListener("popstate", function (e) {
+    S();
+  });
+  S();
+  function g() {
+    const e = setInterval(() => {
+      var n, o, u, t;
+      p(),
+        (((n = c == null ? void 0 : c.element()) != null &&
+          n.getAttribute("floClickAdded")) ||
+          ((o = s == null ? void 0 : s.element()) != null &&
+            o.getAttribute("floClickAdded")) ||
+          ((u = d == null ? void 0 : d.element()) != null &&
+            u.getAttribute("floClickAdded")) ||
+          ((t = i == null ? void 0 : i.element()) != null &&
+            t.getAttribute("floClickAdded"))) &&
+          clearInterval(e);
+    }, 2e3);
+  }
+  function v() {
+    var e;
+    (e = window.ethereum) == null || e.on("accountsChanged", w);
+  }
+  function M() {
+    window.addEventListener("storage", function (e) {
+      console.log("Local storage changed", e);
+    });
+  }
+  function w(e) {
+    O(e[0]), e[0] && f(r.EVENTS.CONNECT_WALLET, { walletAddress: E() });
+  }
+  function O(e) {
+    I = e;
+  }
+  function E() {
+    return I;
+  }
+  function p() {
+    var e, n, o, u, t, l, a, C, L, N, m, _;
+    console.log("event listener called"),
+      ((e = c == null ? void 0 : c.element()) != null &&
+        e.getAttribute("floClickAdded")) ||
+        ((n = c == null ? void 0 : c.element()) == null ||
+          n.setAttribute("floClickAdded", "true"),
+        (o = c == null ? void 0 : c.element()) == null ||
+          o.addEventListener("click", function () {
+            f(c.event, { walletAddress: E() }), A("mint");
+          })),
+      ((u = s == null ? void 0 : s.element()) != null &&
+        u.getAttribute("floClickAdded")) ||
+        ((t = s == null ? void 0 : s.element()) == null ||
+          t.setAttribute("floClickAdded", "true"),
+        (l = s == null ? void 0 : s.element()) == null ||
+          l.addEventListener("click", function () {
+            f(s.event, {
+              walletAddress: E(),
+              tokenId: r.SELECTORS.NFT_TOKEN_ID.element(),
+              amount: r.SELECTORS.AMOUNT.element(),
+            }),
+              A("purchase");
+          })),
+      ((a = i == null ? void 0 : i.element()) != null &&
+        a.getAttribute("floClickAdded")) ||
+        ((C = i == null ? void 0 : i.element()) == null ||
+          C.setAttribute("floClickAdded", "true"),
+        (L = i == null ? void 0 : i.element()) == null ||
+          L.addEventListener("click", function () {
+            f(i.event, { tokenId: r.SELECTORS.NFT_TOKEN_ID.element() }),
+              A("mint");
+          })),
+      ((N = d == null ? void 0 : d.element()) != null &&
+        N.getAttribute("floClickAdded")) ||
+        ((m = d == null ? void 0 : d.element()) == null ||
+          m.setAttribute("floClickAdded", "true"),
+        (_ = d == null ? void 0 : d.element()) == null ||
+          _.addEventListener("click", function () {
+            f(d.event, {
+              walletAddress: E(),
+              tokenId: r.SELECTORS.NFT_TOKEN_ID.element(),
+              amount: r.SELECTORS.AMOUNT.element(),
+            }),
+              A("purchase");
+          }));
+  }
+  function f(e, n) {
+    plausible(e, { props: n });
+  }
+  function A(e) {
+    const n = setInterval(() => {
+      const o = r.SELECTORS.SUCCESS_POPUP_MSG.element(),
+        u = r.SELECTORS.VIEW_COLLECTION_BTN.element(),
+        t = {
+          walletAddress: E(),
+          tokenId: r.SELECTORS.NFT_TOKEN_ID.element(),
+          amount: r.SELECTORS.AMOUNT.element(),
+        };
+      o && u && e === "mint"
+        ? (f(r.EVENTS.MINTED, { ...t }), clearInterval(n))
+        : o &&
+          e === "purchase" &&
+          (f(r.EVENTS.PURCHASED, { ...t }), clearInterval(n));
+    }, 5e3);
+  }
+</script>
