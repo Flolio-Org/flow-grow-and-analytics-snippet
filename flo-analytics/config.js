@@ -71,5 +71,3 @@ export default {
     },
   },
 };
-
-// "You now own", View Collection for mint

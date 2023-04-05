@@ -7,9 +7,7 @@ const buyWithCredit = config.SELECTORS.BUY_WITH_CREDIT_BTN;
 
 function eventInit() {
   setUserAddress(window.ethereum?.selectedAddress);
-  addMetamaskConnectObservers();
   setBodyMutationObserver();
-  setStorageListener();
 }
 
 (function (history) {
@@ -27,6 +25,7 @@ window.addEventListener("popstate", function (event) {
 });
 
 eventInit();
+addMetamaskConnectObservers();
 
 function setBodyMutationObserver() {
   const floObserver = setInterval(() => {
@@ -43,12 +42,6 @@ function setBodyMutationObserver() {
 
 function addMetamaskConnectObservers() {
   window.ethereum?.on("accountsChanged", handleAccountsChanged);
-}
-
-function setStorageListener() {
-  window.addEventListener("storage", function (e) {
-    console.log("Local storage changed", e);
-  });
 }
 
 function handleAccountsChanged(accounts) {
@@ -69,7 +62,7 @@ function getUserAddress() {
 }
 
 function setPageClickEventListeners() {
-  console.log("event listener called");
+  // console.log("event listener called");
   if (!mintBtn?.element()?.getAttribute("floClickAdded")) {
     mintBtn?.element()?.setAttribute("floClickAdded", "true");
     mintBtn?.element()?.addEventListener("click", function () {
@@ -116,7 +109,7 @@ function setPageClickEventListeners() {
 }
 
 function triggerEvent(eventName, params) {
-  plausible(eventName, { props: params });
+  floliop(eventName, { props: params });
 }
 
 function addPageChangeListener(type) {

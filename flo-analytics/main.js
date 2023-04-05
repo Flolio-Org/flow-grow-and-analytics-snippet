@@ -5,13 +5,16 @@ const buyBtn = config.SELECTORS.BUY_BTN;
 const mintWithCredit = config.SELECTORS.MINT_WITH_CREDIT_BTN;
 const buyWithCredit = config.SELECTORS.BUY_WITH_CREDIT_BTN;
 
+// initialize script
+eventInit();
+
 function eventInit() {
-  setUserAddress(window.ethereum?.selectedAddress);
-  addMetamaskConnectObservers();
-  setBodyMutationObserver();
-  setStorageListener();
+  setUserAddress(window.ethereum?.selectedAddress); //set address if already available
+  addMetamaskConnectObservers(); //set metamask observer
+  setBodyMutationObserver(); // set page change observer
 }
 
+// run init again if page changed
 (function (history) {
   var pushState = history.pushState;
   eventInit();
@@ -26,8 +29,11 @@ window.addEventListener("popstate", function (event) {
   eventInit();
 });
 
-eventInit();
-
+// mutation observer
+/**
+ * check if click listeners are already added, if not
+ * add listeners and attach data-attributes to avoid multiple api calls
+ */
 function setBodyMutationObserver() {
   const floObserver = setInterval(() => {
     setPageClickEventListeners();
@@ -41,35 +47,8 @@ function setBodyMutationObserver() {
   }, 2000);
 }
 
-function addMetamaskConnectObservers() {
-  window.ethereum?.on("accountsChanged", handleAccountsChanged);
-}
-
-function setStorageListener() {
-  window.addEventListener("storage", function (e) {
-    console.log("Local storage changed", e);
-  });
-}
-
-function handleAccountsChanged(accounts) {
-  setUserAddress(accounts[0]);
-  if (accounts[0]) {
-    triggerEvent(config.EVENTS.CONNECT_WALLET, {
-      walletAddress: getUserAddress(),
-    });
-  }
-}
-
-function setUserAddress(add) {
-  ANALYTICS_USER_ADDRESS = add;
-}
-
-function getUserAddress() {
-  return ANALYTICS_USER_ADDRESS;
-}
-
 function setPageClickEventListeners() {
-  console.log("event listener called");
+  // console.log("event listener called");
   if (!mintBtn?.element()?.getAttribute("floClickAdded")) {
     mintBtn?.element()?.setAttribute("floClickAdded", "true");
     mintBtn?.element()?.addEventListener("click", function () {
@@ -137,4 +116,27 @@ function addPageChangeListener(type) {
       clearInterval(successActionInterval);
     }
   }, 5000);
+}
+
+// metamask connect observer
+function addMetamaskConnectObservers() {
+  window.ethereum?.on("accountsChanged", handleAccountsChanged);
+}
+
+function handleAccountsChanged(accounts) {
+  setUserAddress(accounts[0]);
+  if (accounts[0]) {
+    triggerEvent(config.EVENTS.CONNECT_WALLET, {
+      walletAddress: getUserAddress(),
+    });
+  }
+}
+
+//getter and setters for wallet address
+function setUserAddress(add) {
+  ANALYTICS_USER_ADDRESS = add;
+}
+
+function getUserAddress() {
+  return ANALYTICS_USER_ADDRESS;
 }
