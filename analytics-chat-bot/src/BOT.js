@@ -1,13 +1,5 @@
 import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  TypingIndicator,
-} from "@chatscope/chat-ui-kit-react";
-import { useState } from "preact/hooks";
+import { useState, useEffect } from "preact/hooks";
 import config from "./config";
 import {
   buildAPIQuery,
@@ -15,83 +7,75 @@ import {
   renderAggregateResult,
 } from "./utils";
 import api from "./apiService";
-import { parseUserStringFromRegexService } from "./regexMatcherService";
+import "react-chat-elements/dist/main.css";
+import { MessageList, Input, Button } from "react-chat-elements";
 
 const MY_BOT = () => {
   const [inputMessage, setInputMessage] = useState("");
-  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const [filterStepAt, setFilterStepAt] = useState(0);
+  const [selectedQueryParams, setSelectedQueryParams] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [messageStack, setMessageStack] = useState([
     {
-      message: "Hello my friend",
-      sentTime: new Date().toString(),
-      sender: "Flolio",
-      position: "single",
-      direction: "incoming",
+      position: "left",
+      type: "text",
+      title: "Flolio",
+      text: "Hello my friend !",
     },
   ]);
 
-  async function parseUserMessageFromInput(userMessage, msgStack) {
-    // const extractedParams = await parseUserMessage(userMessage);
+  async function handleUserInputText(_, msgStack) {
+    setMessageStack([
+      ...msgStack,
+      {
+        position: "left",
+        type: "text",
+        title: "Flolio",
+        text: `Hi Let me help you get the stats. Please select for which event you want the data`,
+      },
+    ]);
 
-    const extractedBody = await parseUserStringFromRegexService(
-      userMessage
+    // show selector options
+    setFilterStepAt(1); // update step status
+  }
+
+  useEffect(() => {
+    const chatList = new Array(
+      ...document.querySelectorAll(".rce-container-mbox")
     );
-    console.log("🚀 ~ file: BOT.js:39 ~ parseUserMessageFromInput ~ extractedBody:", extractedBody)
+    const lastElement = chatList[chatList.length - 1];
+    lastElement.scrollIntoView();
+  }, [messageStack]);
 
-    if (!Object.keys(extractedBody).length) {
-      showSuggestionMsg(null, msgStack);
-      return;
-    }
-
-    let body =
-      extractedBody.apiType === "aggregate"
-        ? {
-            filters: extractedBody.filters,
-            metric: extractedBody.metric,
-          }
-        : {
-            metric: extractedBody.metric,
-            property: extractedBody.property,
-            filters: extractedBody.filters,
-          };
-
-      if(extractedBody.duration == '6mo') {
-        body['duration'] = extractedBody.duration
-      } else {
-        body['period'] = 'custom'
-        body['date'] =  extractedBody.duration
-      }
-
-    if (!Object.keys(body).length) {
-      showSuggestionMsg(null, msgStack);
-      return;
-    }
-
-    const urlPath = config.API_FILTER_PATH[extractedBody.apiType];
-
-    const res = await getAPIData(urlPath, body);
+  async function getStatsFromSelectedQuery(duration, msgStack) {
+    // console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
+    let finalQueryBody = {
+      ...selectedQueryParams.body,
+      ...duration.body,
+    };
+    const apiURL = config.API_FILTER_PATH[selectedQueryParams.apiType];
+    // console.log({ finalQueryBody, apiURL });
+    const res = await getAPIData(apiURL, finalQueryBody);
     if (!res.results) {
       showSuggestionMsg(null, msgStack);
       return;
     }
-
     const formateResp =
-      extractedBody.apiType === "breakdown"
+      selectedQueryParams.apiType === "breakdown"
         ? renderBreakdownResult(res)
         : renderAggregateResult(res);
 
     setMessageStack([
       ...msgStack,
       {
-        message: formateResp,
-        sender: "Flolio",
-        sentTime: new Date().toString(),
-        direction: "incoming",
-        position: "single",
-        showInHTML: true,
+        position: "left",
+        type: "text",
+        title: "Flolio",
+        text: formateResp,
       },
     ]);
-    setShowTypingIndicator(false);
+
+    // console.log({ formateResp });
   }
 
   async function getAPIData(urlPath, body) {
@@ -102,69 +86,189 @@ const MY_BOT = () => {
   }
 
   function showSuggestionMsg(msg, msgStack) {
-    setShowTypingIndicator(false);
     setMessageStack([
       ...msgStack,
       {
-        message: msg
-          ? msg
-          : `I'm sorry, I couldn't understand your query. Please try rephrasing your question or providing more context. Here are some examples of the kinds of questions you can ask me: \n - Give me visitor count from facebook in last week`,
-        sentTime: new Date().toString(),
-        sender: "Flolio",
+        position: "left",
+        type: "text",
+        title: "Flolio",
+        text: `I'm sorry, I couldn't understand your query. Please try rephrasing your question or providing more context. Here are some examples of the kinds of questions you can ask me: \n - Give me visitor count from facebook in last week`,
       },
     ]);
   }
 
   return (
-    <div style={{ position: "relative", height: "500px", width: "400px" }}>
-      <MainContainer>
-        <ChatContainer>
-          <MessageList>
-            {messageStack.map((item) => {
-              if (item.showInHTML) {
-                return (
-                  <Message model={{ ...item }}>
-                    <Message.HtmlContent
-                      model={{ ...item }}
-                      html={item?.message}
-                    />
-                  </Message>
-                );
-              } else return <Message model={{ ...item }} />;
-            })}
-            {showTypingIndicator ? <TypingIndicator /> : null}
-          </MessageList>
-
-          <MessageInput
-            placeholder="Type message here"
+    <div className="messageContainer">
+      <div className="chatHeader">
+        <h3>Welcome to FLOLiO</h3>
+      </div>
+      <MessageList
+        className="message-list"
+        lockable={true}
+        toBottomHeight={"100%"}
+        dataSource={[...messageStack]}
+      />
+      <div className="puller" />
+      {!filterStepAt ? (
+        <div className="messageWrapper">
+          <Input
+            className="messageInput"
+            placeholder="Type here..."
             value={inputMessage}
-            attachButton={null}
-            onChange={(msg) => {
-              setInputMessage(msg);
+            onKeyUp={(e) => {
+              if (e.keyCode === 13) {
+                document.querySelector(".messageSend").click();
+              }
             }}
-            onSend={(val) => {
-              setShowTypingIndicator(true);
-              console.log({ val });
+            onChange={(e) => {
+              setInputMessage(e.target.value);
+            }}
+          />
+          <Button
+            // ref={sendBTNRef}
+            className="messageSend"
+            disabled={!inputMessage?.length}
+            icon={{
+              float: "left",
+              size: 15,
+              component: (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="sendIcon"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                  />
+                </svg>
+              ),
+            }}
+            onClick={() => {
+              const val = inputMessage;
               const msgStack = [
                 ...messageStack,
                 {
-                  message: val,
-                  sentTime: new Date().toString(),
-                  direction: "outgoing",
-                  position: "single",
-                  sender: "User",
+                  position: "right",
+                  type: "text",
+                  text: val,
                 },
               ];
+              document.querySelector(".messageInput").value = null;
               setMessageStack(msgStack);
               setTimeout(() => {
-                parseUserMessageFromInput(val, msgStack);
-              }, 2000);
-
-              setInputMessage("");
+                handleUserInputText(val, msgStack);
+              }, 1000);
+              setInputMessage(null);
             }}
+            title="Send"
           />
-        </ChatContainer>
-      </MainContainer>
+        </div>
+      ) : null}
+      {filterStepAt === 1 ? (
+        <div className="selectorWrapper">
+          {Object.values(config.QUERY_PARAMS).map((item) => {
+            return (
+              <Button
+                text={item.title}
+                onClick={() => {
+                  setSelectedQueryParams(item);
+                  setFilterStepAt(2);
+                  const msgStack = [
+                    ...messageStack,
+                    {
+                      position: "right",
+                      type: "text",
+                      text: item.title,
+                    },
+                    {
+                      position: "left",
+                      type: "text",
+                      title: "Flolio",
+                      text: `You selected ${item.title}`,
+                    },
+                    {
+                      position: "left",
+                      type: "text",
+                      title: "Flolio",
+                      text: `Please select filter event`,
+                    },
+                  ];
+                  setMessageStack(msgStack);
+                }}
+                title={item.title}
+              />
+            );
+          })}
+        </div>
+      ) : null}
+      {filterStepAt === 2 ? (
+        <div className="selectorWrapper">
+          {Object.keys(config.EVENTS).map((item) => {
+            return (
+              <Button
+                text={config.EVENTS[item]}
+                onClick={() => {
+                  setFilterStepAt(3);
+                  setSelectedEvent(item);
+                  const msgStack = [
+                    ...messageStack,
+                    {
+                      position: "right",
+                      type: "text",
+                      text: config.EVENTS[item],
+                    },
+                    {
+                      position: "right",
+                      type: "text",
+                      text: `You selected ${config.EVENTS[item]}`,
+                    },
+                    {
+                      position: "left",
+                      type: "text",
+                      title: "Flolio",
+                      text: `Please select duration`,
+                    },
+                  ];
+                  setMessageStack(msgStack);
+                }}
+                title={item.title}
+              />
+            );
+          })}
+        </div>
+      ) : null}
+      {filterStepAt === 3 ? (
+        <div className="selectorWrapper">
+          {config.DURATIONS.map((item) => {
+            return (
+              <Button
+                text={item.title}
+                onClick={() => {
+                  // setSelectedDuration(item);
+                  setFilterStepAt(0);
+                  const msgStack = [
+                    ...messageStack,
+                    {
+                      position: "left",
+                      type: "text",
+                      title: "Flolio",
+                      text: `You selected ${item.title}`,
+                    },
+                  ];
+                  setMessageStack(msgStack);
+                  getStatsFromSelectedQuery(item, msgStack);
+                }}
+                title={item.title}
+              />
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 };

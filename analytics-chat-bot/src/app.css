@@ -23,3 +23,61 @@
 .read-the-docs {
   color: #888;
 }
+
+.messageWrapper {
+  display: flex;
+  padding-top: 10px;
+  border-top: 1px solid #dee2e6;
+}
+
+.messageContainer {
+  position: relative;
+  height: 500px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #dee2e6;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.rce-container-input {
+  min-width: auto !important;
+  width: 100% !important;
+}
+
+.rce-container-mlist {
+  height: 100%;
+}
+
+.message-list {
+  overflow-y: auto;
+  padding-bottom: 15px;
+  padding-top: 15px;
+}
+
+.sendIcon {
+  height: 24px;
+  width: 24px;
+}
+
+.selectorWrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.selectorWrapper .rce-button {
+  flex-shrink: 0;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+.chatHeader {
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.chatHeader h3 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

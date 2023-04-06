@@ -1,6 +1,4 @@
 import { useState } from "preact/hooks";
-// import preactLogo from "./assets/preact.svg";
-// import viteLogo from "/vite.svg";
 import "./app.css";
 import MY_BOT from "./BOT";
 
@@ -8,7 +6,7 @@ export function App() {
   const [showBOT, setShowBOT] = useState(false);
   return (
     <>
-      <div style={{margin: "10px"}}>
+      <div style={{ margin: "10px" }}>
         {showBOT ? (
           <div
             style={{
@@ -23,7 +21,7 @@ export function App() {
         <div class="action">
           <div class="font-bold absolute bottom-10 left-10 action-container">
             <button
-              style={{color: "#fff"}}
+              style={{ color: "#fff" }}
               id="widget-toggle-button"
               onClick={() => setShowBOT(!showBOT)}
             >
