@@ -20,7 +20,7 @@ const MY_BOT = () => {
       position: "left",
       type: "text",
       title: "Flolio",
-      text: "Hello friend !",
+      text: "Hello friend!",
     },
   ]);
   console.log("initializing chat BOT");
@@ -37,11 +37,11 @@ const MY_BOT = () => {
   }
 
   useEffect(() => {
-    // const chatList = new Array(
-    //   ...document.querySelectorAll(".rce-container-mbox")
-    // );
-    // const lastElement = chatList[chatList.length - 1];
-    // lastElement.scrollIntoView();
+    const chatList = new Array(
+      ...document.querySelectorAll(".rce-container-mbox")
+    );
+    const lastElement = chatList[chatList.length - 1];
+    lastElement.scrollIntoView();
   }, [messageStack]);
 
   async function getStatsFromSelectedQuery(duration, msgStack) {
