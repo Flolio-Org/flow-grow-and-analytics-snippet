@@ -20,7 +20,7 @@ const MY_BOT = () => {
       position: "left",
       type: "text",
       title: "Flolio",
-      text: "Hello my friend !",
+      text: "Hello friend !",
     },
   ]);
 
@@ -34,9 +34,6 @@ const MY_BOT = () => {
         text: `Hi Let me help you get the stats. Please select for which event you want the data`,
       },
     ]);
-
-    // show selector options
-    setFilterStepAt(1); // update step status
   }
 
   useEffect(() => {
@@ -48,13 +45,19 @@ const MY_BOT = () => {
   }, [messageStack]);
 
   async function getStatsFromSelectedQuery(duration, msgStack) {
-    // console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
+    console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
     let finalQueryBody = {
       ...selectedQueryParams.body,
       ...duration.body,
     };
     const apiURL = config.API_FILTER_PATH[selectedQueryParams.apiType];
-    // console.log({ finalQueryBody, apiURL });
+    if (
+      selectedQueryParams.id === "events_count" ||
+      selectedQueryParams.id === "events_breakdown"
+    ) {
+      finalQueryBody["filters"] = "event:name==" + config.EVENTS[selectedEvent];
+    }
+    console.log({ finalQueryBody, apiURL });
     const res = await getAPIData(apiURL, finalQueryBody);
     if (!res.results) {
       showSuggestionMsg(null, msgStack);
@@ -92,7 +95,9 @@ const MY_BOT = () => {
         position: "left",
         type: "text",
         title: "Flolio",
-        text: `I'm sorry, I couldn't understand your query. Please try rephrasing your question or providing more context. Here are some examples of the kinds of questions you can ask me: \n - Give me visitor count from facebook in last week`,
+        text: msg
+          ? msg
+          : `I'm sorry, I couldn't understand your query. Please try rephrasing your question or providing more context. Here are some examples of the kinds of questions you can ask me: \n - Give me visitor count from facebook in last week`,
       },
     ]);
   }
@@ -158,6 +163,7 @@ const MY_BOT = () => {
                   text: val,
                 },
               ];
+              setFilterStepAt(1);
               document.querySelector(".messageInput").value = null;
               setMessageStack(msgStack);
               setTimeout(() => {
@@ -177,7 +183,15 @@ const MY_BOT = () => {
                 text={item.title}
                 onClick={() => {
                   setSelectedQueryParams(item);
-                  setFilterStepAt(2);
+                  console.log({ item });
+                  if (
+                    item?.id === "events_count" ||
+                    item?.id === "events_breakdown"
+                  ) {
+                    setFilterStepAt(2);
+                  } else {
+                    setFilterStepAt(3);
+                  }
                   const msgStack = [
                     ...messageStack,
                     {
@@ -195,7 +209,11 @@ const MY_BOT = () => {
                       position: "left",
                       type: "text",
                       title: "Flolio",
-                      text: `Please select filter event`,
+                      text:
+                        selectedQueryParams?.id === "events_count" ||
+                        selectedQueryParams?.id === "events_breakdown"
+                          ? `Please select filter event`
+                          : `Please select duration`,
                     },
                   ];
                   setMessageStack(msgStack);
@@ -206,7 +224,8 @@ const MY_BOT = () => {
           })}
         </div>
       ) : null}
-      {filterStepAt === 2 ? (
+      {(filterStepAt === 2 && selectedQueryParams?.id === "events_count") ||
+      selectedQueryParams?.id === "events_breakdown" ? (
         <div className="selectorWrapper">
           {Object.keys(config.EVENTS).map((item) => {
             return (

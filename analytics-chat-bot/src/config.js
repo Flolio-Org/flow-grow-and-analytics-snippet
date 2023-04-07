@@ -21,15 +21,15 @@ const config = {
     purchased: "Purchased",
   },
   QUERY_PARAMS: {
-    conversion_rate: {
-      id: "conversion_rate",
-      title: "Conversion Rate",
-      apiType: "breakdown",
-      body: {
-        property: "visit:source",
-        metric: "conversions",
-      },
-    },
+    // conversion_rate: {
+    //   id: "conversion_rate",
+    //   title: "Conversion Rate",
+    //   apiType: "breakdown",
+    //   body: {
+    //     property: "visit:source",
+    //     metric: "conversions",
+    //   },
+    // },
     top_pages: {
       title: "Top pages",
       id: "top_pages",
@@ -93,6 +93,23 @@ const config = {
         property: "visit:device",
       },
     },
+    events_count: {
+      title: "Event count",
+      id: "events_count",
+      apiType: "aggregate",
+      body: {
+        metric: "events",
+      },
+    },
+    events_breakdown: {
+      title: "Event breakdown",
+      id: "events_breakdown",
+      apiType: "breakdown",
+      body: {
+        property: "visit:source",
+        metric: "events",
+      },
+    },
   },
   DURATIONS: [
     {
@@ -139,7 +156,7 @@ const config = {
       id: "lastMonth",
       title: "Last Month",
       body: {
-        period: "day",
+        period: "custom",
         ...getDuration("lastMonth"),
       },
     },
