@@ -95,7 +95,7 @@ function setPageClickEventListeners() {
 }
 
 function triggerEvent(eventName, params) {
-  plausible(eventName, { props: params });
+  floliop(eventName, { props: params });
 }
 
 function addPageChangeListener(type) {

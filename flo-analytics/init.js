@@ -25,6 +25,7 @@ window.intFloGrow = function () {
     true
     // "https://plausible.io/js/script.js"
   );
+
   insertScript.onload = () => {
     console.log("script loaded");
     loadEventScript();
