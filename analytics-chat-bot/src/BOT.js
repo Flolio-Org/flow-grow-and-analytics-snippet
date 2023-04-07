@@ -45,7 +45,7 @@ const MY_BOT = () => {
   }, [messageStack]);
 
   async function getStatsFromSelectedQuery(duration, msgStack) {
-    console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
+    // console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
     let finalQueryBody = {
       ...selectedQueryParams.body,
       ...duration.body,
@@ -57,7 +57,7 @@ const MY_BOT = () => {
     ) {
       finalQueryBody["filters"] = "event:name==" + config.EVENTS[selectedEvent];
     }
-    console.log({ finalQueryBody, apiURL });
+    // console.log({ finalQueryBody, apiURL });
     const res = await getAPIData(apiURL, finalQueryBody);
     if (!res.results) {
       showSuggestionMsg(null, msgStack);
