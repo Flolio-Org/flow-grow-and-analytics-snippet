@@ -224,8 +224,9 @@ const MY_BOT = () => {
           })}
         </div>
       ) : null}
-      {(filterStepAt === 2 && selectedQueryParams?.id === "events_count") ||
-      selectedQueryParams?.id === "events_breakdown" ? (
+      {filterStepAt === 2 &&
+      (selectedQueryParams?.id === "events_count" ||
+        selectedQueryParams?.id === "events_breakdown") ? (
         <div className="selectorWrapper">
           {Object.keys(config.EVENTS).map((item) => {
             return (
