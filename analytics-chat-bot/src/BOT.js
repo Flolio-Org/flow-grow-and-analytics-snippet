@@ -23,7 +23,7 @@ const MY_BOT = () => {
       text: "Hello friend !",
     },
   ]);
-
+  console.log("initializing chat BOT");
   async function handleUserInputText(_, msgStack) {
     setMessageStack([
       ...msgStack,
