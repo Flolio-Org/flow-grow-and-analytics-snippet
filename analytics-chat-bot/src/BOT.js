@@ -9,12 +9,15 @@ import {
 import api from "./apiService";
 import "react-chat-elements/dist/main.css";
 import { MessageList, Input, Button } from "react-chat-elements";
+import { TypingIndicator } from "@chatscope/chat-ui-kit-react";
 
 const MY_BOT = () => {
+  const [msgLoading, setMsgLoading] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
-  const [filterStepAt, setFilterStepAt] = useState(0);
+  const [filterStepAt, setFilterStepAt] = useState(1);
   const [selectedQueryParams, setSelectedQueryParams] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedFilterOrGroupBy, setSelectedFilterOrGroupBy] = useState(null);
   const [messageStack, setMessageStack] = useState([
     {
       position: "left",
@@ -22,19 +25,14 @@ const MY_BOT = () => {
       title: "Flolio",
       text: "Hello friend!",
     },
+    {
+      position: "left",
+      type: "text",
+      title: "Flolio",
+      text: "What do you want to know?",
+    },
   ]);
   console.log("initializing chat BOT");
-  async function handleUserInputText(_, msgStack) {
-    setMessageStack([
-      ...msgStack,
-      {
-        position: "left",
-        type: "text",
-        title: "Flolio",
-        text: `Hi Let me help you get the stats. Please select for which event you want the data`,
-      },
-    ]);
-  }
 
   useEffect(() => {
     const chatList = new Array(
@@ -45,7 +43,8 @@ const MY_BOT = () => {
   }, [messageStack]);
 
   async function getStatsFromSelectedQuery(duration, msgStack) {
-    // console.log({ selectedQueryParams, selectedEvent, duration, msgStack });
+    setMsgLoading(true)
+    console.log({ selectedQueryParams, selectedFilterOrGroupBy, selectedEvent, duration, msgStack });
     let finalQueryBody = {
       ...selectedQueryParams.body,
       ...duration.body,
@@ -57,7 +56,14 @@ const MY_BOT = () => {
     ) {
       finalQueryBody["filters"] = "event:name==" + config.EVENTS[selectedEvent];
     }
-    // console.log({ finalQueryBody, apiURL });
+
+    if (selectedFilterOrGroupBy) {
+      if (selectedFilterOrGroupBy !== 'All' && selectedQueryParams?.type == 'count')
+        finalQueryBody["filters"] = "visit:source==" + selectedFilterOrGroupBy
+      if (selectedQueryParams?.type == 'list')
+        finalQueryBody["metrics"] = selectedFilterOrGroupBy
+    }
+
     const res = await getAPIData(apiURL, finalQueryBody);
     if (!res.results) {
       showSuggestionMsg(null, msgStack);
@@ -78,7 +84,8 @@ const MY_BOT = () => {
       },
     ]);
 
-    // console.log({ formateResp });
+    console.log({ formateResp });
+    setMsgLoading(false)
   }
 
   async function getAPIData(urlPath, body) {
@@ -114,6 +121,7 @@ const MY_BOT = () => {
         dataSource={[...messageStack]}
       />
       <div className="puller" />
+      {msgLoading ? <TypingIndicator content="CLiO bot is thinking" /> : ""}
       {!filterStepAt ? (
         <div className="messageWrapper">
           <Input
@@ -166,9 +174,6 @@ const MY_BOT = () => {
               setFilterStepAt(1);
               document.querySelector(".messageInput").value = null;
               setMessageStack(msgStack);
-              setTimeout(() => {
-                handleUserInputText(val, msgStack);
-              }, 1000);
               setInputMessage(null);
             }}
             title="Send"
@@ -183,14 +188,13 @@ const MY_BOT = () => {
                 text={item.title}
                 onClick={() => {
                   setSelectedQueryParams(item);
-                  console.log({ item });
                   if (
                     item?.id === "events_count" ||
                     item?.id === "events_breakdown"
                   ) {
                     setFilterStepAt(2);
                   } else {
-                    setFilterStepAt(3);
+                    setFilterStepAt(1.5);
                   }
                   const msgStack = [
                     ...messageStack,
@@ -203,17 +207,11 @@ const MY_BOT = () => {
                       position: "left",
                       type: "text",
                       title: "Flolio",
-                      text: `You selected ${item.title}`,
-                    },
-                    {
-                      position: "left",
-                      type: "text",
-                      title: "Flolio",
                       text:
                         selectedQueryParams?.id === "events_count" ||
-                        selectedQueryParams?.id === "events_breakdown"
+                          selectedQueryParams?.id === "events_breakdown"
                           ? `Please select filter event`
-                          : `Please select duration`,
+                          : `Please select parameter to ${item?.type == 'list' ? 'group results by' : 'filter results'}`,
                     },
                   ];
                   setMessageStack(msgStack);
@@ -224,9 +222,43 @@ const MY_BOT = () => {
           })}
         </div>
       ) : null}
+      {filterStepAt === 1.5 ? (
+        <div className="selectorWrapper">
+          {(selectedQueryParams.type == 'list' ? config.LIST_GROUPBYS : config.COUNT_FILTERS).map((item) => {
+            return (
+              <Button
+                style={{
+                  textTransform: 'capitalize'
+                }}
+                text={item.replace('_',' ')}
+                onClick={() => {
+                  setSelectedFilterOrGroupBy(item);
+                  const msgStack = [
+                    ...messageStack,
+                    {
+                      position: "right",
+                      type: "text",
+                      text: item,
+                    },
+                    {
+                      position: "left",
+                      type: "text",
+                      title: "Flolio",
+                      text: `Please select duration`,
+                    },
+                  ];
+                  setMessageStack(msgStack);
+                  setFilterStepAt(3);
+                }}
+                title={item.title}
+              />
+            );
+          })}
+        </div>
+      ) : null}
       {filterStepAt === 2 &&
-      (selectedQueryParams?.id === "events_count" ||
-        selectedQueryParams?.id === "events_breakdown") ? (
+        (selectedQueryParams?.id === "events_count" ||
+          selectedQueryParams?.id === "events_breakdown") ? (
         <div className="selectorWrapper">
           {Object.keys(config.EVENTS).map((item) => {
             return (
@@ -241,11 +273,6 @@ const MY_BOT = () => {
                       position: "right",
                       type: "text",
                       text: config.EVENTS[item],
-                    },
-                    {
-                      position: "right",
-                      type: "text",
-                      text: `You selected ${config.EVENTS[item]}`,
                     },
                     {
                       position: "left",
@@ -270,14 +297,14 @@ const MY_BOT = () => {
                 text={item.title}
                 onClick={() => {
                   // setSelectedDuration(item);
-                  setFilterStepAt(0);
+                  setFilterStepAt(4);
                   const msgStack = [
                     ...messageStack,
                     {
-                      position: "left",
+                      position: "right",
                       type: "text",
                       title: "Flolio",
-                      text: `You selected ${item.title}`,
+                      text: `${item.title}`,
                     },
                   ];
                   setMessageStack(msgStack);
@@ -287,6 +314,32 @@ const MY_BOT = () => {
               />
             );
           })}
+        </div>
+      ) : null}
+      {filterStepAt === 4 ? (
+        <div className="selectorWrapper">
+          <Button
+            text="Restart?"
+            onClick={() => {
+              setFilterStepAt(1);
+              const msgStack = [
+                {
+                  position: "left",
+                  type: "text",
+                  title: "Flolio",
+                  text: "Hello friend!",
+                },
+                {
+                  position: "left",
+                  type: "text",
+                  title: "Flolio",
+                  text: "What do you want to know?",
+                },
+              ];
+              setMessageStack(msgStack);
+            }}
+            title="Restart"
+          />
         </div>
       ) : null}
     </div>

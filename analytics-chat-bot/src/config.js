@@ -21,15 +21,6 @@ const config = {
     purchased: "Purchased",
   },
   QUERY_PARAMS: {
-    // conversion_rate: {
-    //   id: "conversion_rate",
-    //   title: "Conversion Rate",
-    //   apiType: "breakdown",
-    //   body: {
-    //     property: "visit:source",
-    //     metric: "conversions",
-    //   },
-    // },
     top_pages: {
       title: "Top pages",
       id: "top_pages",
@@ -37,6 +28,7 @@ const config = {
       body: {
         property: "event:page",
       },
+      type: "list"
     },
     top_countries: {
       title: "Top countries",
@@ -45,6 +37,7 @@ const config = {
       body: {
         property: "visit:country",
       },
+      type: "list"
     },
     bounce_rate: {
       title: "Bounce rate",
@@ -54,6 +47,7 @@ const config = {
         property: "visit:country",
         metrics: "bounce_rate",
       },
+      type: "count"
     },
     // top_referrer: {
     //   apiType: "breakdown",
@@ -66,8 +60,9 @@ const config = {
       id: "top_utms",
       apiType: "breakdown",
       body: {
-        property: "visit:utm_source",
+        property: "visit:source",
       },
+      type: "list"
     },
     pageviews: {
       title: "Top Page Views",
@@ -76,6 +71,7 @@ const config = {
       body: {
         metrics: "pageviews",
       },
+      type: "list"
     },
     visitors: {
       title: "Visitors",
@@ -84,6 +80,7 @@ const config = {
       body: {
         metrics: "visitors",
       },
+      type: "count"
     },
     devices: {
       title: "Devices",
@@ -92,6 +89,7 @@ const config = {
       body: {
         property: "visit:device",
       },
+      type: "list"
     },
     events_count: {
       title: "Event count",
@@ -100,6 +98,7 @@ const config = {
       body: {
         metric: "events",
       },
+      type: "count"
     },
     events_breakdown: {
       title: "Event breakdown",
@@ -109,6 +108,7 @@ const config = {
         property: "visit:source",
         metric: "events",
       },
+      type: "list"
     },
   },
   DURATIONS: [
@@ -168,5 +168,7 @@ const config = {
       },
     },
   ],
+  LIST_GROUPBYS: ['visitors','visits','pageviews','bounce_rate'],
+  COUNT_FILTERS: ['All','Facebook','Instagram','Google','Twitter','Email','Newsletter','LinkdIn','Youtube']
 };
 export default config;

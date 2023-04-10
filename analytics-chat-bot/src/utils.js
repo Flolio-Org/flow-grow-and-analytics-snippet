@@ -35,7 +35,7 @@ export function renderBreakdownResult(odata) {
         (letter) => letter.toUpperCase()
       )})`;
     })
-    .join("\n");
+    .join(" \n ");
 }
 export function renderAggregateResult(odata) {
   let data = { ...odata };
