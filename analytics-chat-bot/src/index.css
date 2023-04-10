@@ -39,18 +39,11 @@ button:focus-visible {
   position: fixed;
   bottom: 0px;
   right: 0px;
-  width: 150px;
-  height: 150px;
+  width: 100px;
+  height: 100px;
   background-color: transparent !important;
   border-radius: 50%;
   /* box-shadow: 0 5px 5px rgba(0,0,0,0.1); */
-}
-
-@media (min-width: 2560px) {
-  .action {
-    height: 250px;
-    width: 250px;
-  }
 }
 
 .action #widget-toggle-button {
