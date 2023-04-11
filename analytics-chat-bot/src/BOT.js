@@ -55,9 +55,7 @@ const MY_BOT = () => {
       selectedQueryParams.id === "events_breakdown"
     ) {
       finalQueryBody["filters"] = "event:name==" + config.EVENTS[selectedEvent];
-    }
-
-    if (selectedFilterOrGroupBy) {
+    } else if (selectedFilterOrGroupBy) {
       if (selectedFilterOrGroupBy !== 'All' && selectedQueryParams?.type == 'count')
         finalQueryBody["filters"] = "visit:source==" + selectedFilterOrGroupBy
       if (selectedQueryParams?.type == 'list')
@@ -121,7 +119,7 @@ const MY_BOT = () => {
         dataSource={[...messageStack]}
       />
       <div className="puller" />
-      {msgLoading ? <TypingIndicator content="CLiO bot is thinking" /> : ""}
+      {msgLoading ? <TypingIndicator content="CLiO bot is typing" /> : ""}
       {!filterStepAt ? (
         <div className="messageWrapper">
           <Input

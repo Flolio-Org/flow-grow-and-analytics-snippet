@@ -30,10 +30,11 @@ export function renderBreakdownResult(odata) {
       let roVal = [...Object.entries(ro)[1]][1];
       let roMetric = [...Object.entries(ro)[1]][0];
 
-      return `${roKey} - ${roVal} (${roMetric.replace(
-        /(^\w{1})|(\s+\w{1})/g,
-        (letter) => letter.toUpperCase()
-      )})`;
+      // return `${roKey} - ${roVal} (${roMetric.replace(
+      //   /(^\w{1})|(\s+\w{1})/g,
+      //   (letter) => letter.toUpperCase()
+      // )})`;
+      return `${roKey} - ${roVal}`;
     })
     .join(" \n ");
 }
@@ -42,7 +43,8 @@ export function renderAggregateResult(odata) {
   // console.log("🚀 ~ file: utils.js:210 ~ renderAggregateResult ~ data:", data)
   const ro = Object.entries(data.results)[0];
   // console.log("🚀 ~ file: utils.js:40 ~ renderAggregateResult ~ ro:", ro)
-  return `${ro[0]} - ${ro[1].value}`;
+  // return `${ro[0]} - ${ro[1].value}`;
+  return `${ro[1].value}`;
 }
 
 export function getDuration(durationId) {

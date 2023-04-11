@@ -82,15 +82,15 @@ const config = {
       },
       type: "count"
     },
-    devices: {
-      title: "Devices",
-      id: "devices",
-      apiType: "breakdown",
-      body: {
-        property: "visit:device",
-      },
-      type: "list"
-    },
+    // devices: {
+    //   title: "Devices",
+    //   id: "devices",
+    //   apiType: "breakdown",
+    //   body: {
+    //     property: "visit:device",
+    //   },
+    //   type: "list"
+    // },
     events_count: {
       title: "Event count",
       id: "events_count",
