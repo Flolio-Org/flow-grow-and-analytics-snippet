@@ -1,9 +1,9 @@
 import { getDuration } from "./utils";
 const config = {
-  BASE_URL: "https://phantom.flolio.com",
-  TOKEN: "pC2jSWFU4NV7ZkHJ78y84hd4BvRvzfQ4Qcc4wAK1hX_UuNVnJdZMAEMvWkKMJ6SX",
-  SITE_ID: "exceed.story-demo.ogn-review.net",
-  OPEN_API_KEY: "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",
+  BASE_URL: window.BOT_CONFIG.BASE_URL,
+  TOKEN: window.BOT_CONFIG.TOKEN,
+  SITE_ID: window.BOT_CONFIG.SITE_ID,
+  OPEN_API_KEY: window.BOT_CONFIG.OPEN_API_KEY,
   PERIOD: "6mo",
   EVENT_METRICS: "visitors,events",
   PAGE_VIEW_METRICS: "visitors,pageviews",
