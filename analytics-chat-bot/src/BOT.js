@@ -23,7 +23,7 @@ const MY_BOT = () => {
       position: "left",
       type: "text",
       title: "Flolio",
-      text: "Hello friend!",
+      text: "Hi Friend!",
     },
     {
       position: "left",
