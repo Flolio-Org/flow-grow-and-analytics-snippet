@@ -34,7 +34,7 @@ export function renderBreakdownResult(odata) {
         formatedVal = parseFloat(roVal).toLocaleString('en-US')
       } catch {}
       
-      return `${roKey} - ${roVal}`;
+      return `${roKey} - ${formatedVal}`;
     })
     .join(" \n ");
 }
