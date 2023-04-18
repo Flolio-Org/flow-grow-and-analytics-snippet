@@ -25,26 +25,29 @@ export function renderBreakdownResult(odata) {
   // console.log("🚀 ~ file: utils.js:26 ~ renderBreakdownResult ~ data:", data)
   return data.results
     .map((ro) => {
-      // console.log("🚀 ~ file: utils.js:29 ~ .map ~ ro:", ro)
       let roKey = [...Object.entries(ro)[0]][1];
       let roVal = [...Object.entries(ro)[1]][1];
       let roMetric = [...Object.entries(ro)[1]][0];
 
-      // return `${roKey} - ${roVal} (${roMetric.replace(
-      //   /(^\w{1})|(\s+\w{1})/g,
-      //   (letter) => letter.toUpperCase()
-      // )})`;
+      let formatedVal = roVal;
+      try {
+        formatedVal = parseFloat(roVal).toLocaleString('en-US')
+      } catch {}
+      
       return `${roKey} - ${roVal}`;
     })
     .join(" \n ");
 }
 export function renderAggregateResult(odata) {
   let data = { ...odata };
-  // console.log("🚀 ~ file: utils.js:210 ~ renderAggregateResult ~ data:", data)
+
   const ro = Object.entries(data.results)[0];
-  // console.log("🚀 ~ file: utils.js:40 ~ renderAggregateResult ~ ro:", ro)
-  // return `${ro[0]} - ${ro[1].value}`;
-  return `${ro[1].value}`;
+
+  let formatedVal = ro[1].value;
+  try {
+    formatedVal = parseFloat(ro[1].value).toLocaleString('en-US')
+  } catch {}
+  return `${formatedVal}`;
 }
 
 export function getDuration(durationId) {

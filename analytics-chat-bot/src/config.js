@@ -92,7 +92,7 @@ const config = {
     //   type: "list"
     // },
     events_count: {
-      title: "Event count",
+      title: "Conversions",
       id: "events_count",
       apiType: "aggregate",
       body: {
@@ -101,7 +101,7 @@ const config = {
       type: "count"
     },
     events_breakdown: {
-      title: "Event breakdown",
+      title: "Conversion Sources",
       id: "events_breakdown",
       apiType: "breakdown",
       body: {
